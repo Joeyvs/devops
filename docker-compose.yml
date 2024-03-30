@@ -1,0 +1,31 @@
+version: '1'
+name: devops-project
+services:
+  application:
+    container_name: devops-application
+    build: 
+      context: ./application
+      dockerfile: dockerfile
+    command: npm run dev
+    ports: 
+      - 3000:3000
+    depends_on:
+      - database
+    environment:
+      - PORT=3000
+      - MONGO_URL=mongodb://admin:admin@devops-db:27017
+      - DB_NAME=devops-db
+  database:
+    container_name: devops-db
+    image: mongo:latest
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+      - MONGO_INITDB_DATABASE=devops-db
+    expose:
+      - 27017
+    volumes:
+       - mongo_data:/data/db
+volumes:
+  mongo_data:
