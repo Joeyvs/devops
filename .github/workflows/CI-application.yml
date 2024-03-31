@@ -22,6 +22,6 @@ jobs:
         run: npm run lint
         working-directory: ./application
       - name: Run tests
-        uses: ArtiomTr/jest-coverage-report-action@v2
+        uses: ArtiomTr/jest-coverage-report-action@v2.3.0
         with:
           working-directory: ./application
