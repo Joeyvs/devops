@@ -26,27 +26,23 @@ describe('Get Users', () => {
 
 describe('Post Users', () => {
   beforeEach(async () => {
-    await client.connect()
+    await client.connect();
     await db.collection('users').deleteMany({});
   });
 
-  afterAll(async() => {
-    client.close();
+  afterEach(async() => {
+    await client.close();
   });
 
   it('should return success after posting a new user', async () => {
     const newUser = { 'foo': 'bar' };
-    try {
-      const count = await db.collection('users').countDocuments()
-      const res = await request(app).post('/users').send(newUser)
-      const newCount = await db.collection('users').countDocuments()
-      expect(newCount).toBe(count + 1)
-      expect(res.statusCode).toBe(201)
-      expect(res.body).toEqual(expect.objectContaining({ id: expect.any(String) }))
-    } catch (err) {
-      // write test for failure here
-      console.log(`Error ${err}`)
-    }
+    await client.connect();
+    const count = await db.collection('users').countDocuments()
+    const res = await request(app).post('/users').send(newUser)
+    const newCount = await db.collection('users').countDocuments()
+    expect(newCount).toBe(count + 1)
+    expect(res.statusCode).toBe(201)
+    expect(res.body).toEqual(expect.objectContaining({ id: expect.any(String) }))
   })
 
   it('should return error 500 after posting without data', async () => {
