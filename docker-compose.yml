@@ -11,10 +11,27 @@ services:
       - 3000:3000
     depends_on:
       - database
+      - messagebus
     environment:
       - PORT=3000
       - MONGO_URL=mongodb://admin:admin@devops-db:27017
       - DB_NAME=devops-db
+  logger:
+    container_name: devops-logger
+    build: 
+      context: ./logger
+      dockerfile: dockerfile
+    command: npm run dev
+    depends_on:
+      - database
+      - messagebus
+    environment:
+      - MESSAGE_QUEUE=amqp://devops-messagebus
+      - MONGO_URL=mongodb://admin:admin@devops-db:27017
+      - DB_NAME=devops-db
+  messagebus:
+    container_name: devops-messagebus
+    image: rabbitmq:latest
   database:
     container_name: devops-db
     image: mongo:latest
