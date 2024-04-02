@@ -8,7 +8,6 @@ async function start() {
   await channel.prefetch(1);
 
   channel.consume('logs', (msg) => {
-    console.log(msg.content.toString());
     fs.appendFile('/logs/logs.txt', msg.content.toString() + '\n', err => channel.ack(msg));
     console.log('Log saved');
   });
