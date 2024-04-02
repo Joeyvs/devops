@@ -31,7 +31,7 @@ services:
       - messagebus
     environment:
       - MESSAGE_QUEUE=amqp://devops-messagebus
-      - MONGO_URL=mongodb://admin:admin@devops-db:27017
+      - MONGO_URL=mongodb://admin:admin@devops-logs:27018
   messagebus:
     container_name: devops-messagebus
     image: rabbitmq:latest
@@ -46,7 +46,19 @@ services:
     expose:
       - 27017
     volumes:
-       - mongo_data:/data/db
+       - app_data:/data/db
+  logdatabase:
+    container_name: devops-logs
+    image: mongo:latest
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+      - MONGO_INITDB_DATABASE=devops-logs
+    expose:
+      - 27018
+    volumes:
+       - log_data:/data/db
 volumes:
-  mongo_data:
-  logs:
+  app_data:
+  log_data:

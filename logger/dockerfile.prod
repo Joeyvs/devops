@@ -1,7 +1,8 @@
 FROM node:20
 
-ENV MONGO_URL=mongodb://devops-db:27017
+ENV MONGO_URL=mongodb://devops-logs:27018
 ENV DB_NAME=logger
+ENV MESSAGE_QUEUE=amqp://devops-messagebus
 
 WORKDIR /logger
 
@@ -10,7 +11,5 @@ COPY package.json .
 RUN npm install
 
 COPY . .
-
-VOLUME [ "/logs" ]
 
 CMD ["npm", "start"]
