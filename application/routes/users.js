@@ -13,24 +13,45 @@ router.get('/', async function (req, res) {
   const channel = await connection.createChannel();
   await channel.assertQueue('logs', { durable: true });
 
-  channel.sendToQueue('logs', Buffer.from(`Received a request to get all users`))
+  await queueLog(`Received a request to get all users`);
 })
 
 router.post('/', async function (req, res) {
-  const connection = await amqp.connect(process.env.MESSAGE_QUEUE)
-  const channel = await connection.createChannel();
-  await channel.assertQueue('logs', { durable: true });
+  // if (!req.body) {
+  //   res.status(500).json({ error: 'No data provided' })
+  //   queueLog(`Failed to create user: No data provided`);
+  //   return;
+  // }
 
   db.collection('users').insertOne(req.body)
-    .then((user) => {
-      res.status(201).json({ id: user.insertedId })
-      channel.sendToQueue('logs', Buffer.from(`User created with ID: ${user.insertedId} `))
+    .then(async (user) => {
+      res.status(201).json({ id: user.insertedId });
+      await queueLog(`User created with ID: ${user.insertedId} `);
     })
-    .catch(err => {
+    .catch(async (err) => {
       res.status(500).json(err)
-      channel.sendToQueue('logs', Buffer.from(`Failed to create user: ${err}`))
+      await queueLog(`Failed to create user: ${err}`);
     })
     
 })
+
+async function queueLog(log) {
+  try {
+    const connection = await amqp.connect(process.env.MESSAGE_QUEUE);
+    if(!connection) {
+      return;
+    }
+
+    const channel = await connection.createChannel();
+    if(!channel) {
+      return;
+    }
+
+    await channel.assertQueue('logs', { durable: true });
+    channel.sendToQueue('logs', Buffer.from(log))
+  }
+  catch(err) { /* empty */ }	
+  
+}
 
 module.exports = router
