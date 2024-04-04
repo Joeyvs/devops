@@ -1,0 +1,27 @@
+name: Logger CI
+on:
+  push:
+    paths:
+      - 'logger/**'
+  pull_request:
+    branches:
+      - main
+jobs:
+  coverage:
+    name: Tests and linter
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./logger
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install dependencies
+        run: npm install
+      - name: Run linter
+        run: npm run lint
+        working-directory: ./logger
+      - name: Run tests
+        uses: ArtiomTr/jest-coverage-report-action@v2.3.0
+        with:
+          working-directory: ./logger

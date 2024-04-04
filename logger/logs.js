@@ -1,6 +1,5 @@
-const fs = require('fs');
 const amqp = require('amqplib');
-const { db } = require('services/database');
+const { db } = require('./services/database');
 
 async function start() {
   const connection = await amqp.connect(process.env.MESSAGE_QUEUE);
@@ -9,19 +8,25 @@ async function start() {
   await channel.prefetch(1);
 
   channel.consume('logs', (msg) => {
-    const jsonString = '{"info": "' + msg.content.toString() + '"}';
-    const jsonLog = JSON.parse(jsonString);
-
-    db.collection('logs').insertOne(jsonLog)
-    .then((log) => {
-      console.log('Log saved');
-      console.log(log);
-    })
-    .catch(err => {
-      console.log('Error saving log');
-      console.log(err);
-    })
+    logMsg(msg.content.toString());
   });
 }
 
+function logMsg(msg) {
+  const jsonString = '{"info": "' + msg + '"}';
+  const jsonLog = JSON.parse(jsonString);
+
+  db.collection('logs').insertOne(jsonLog)
+  .then((log) => {
+    console.log('Log saved');
+    console.log(log);
+  })
+  .catch(err => {
+    console.log('Error saving log');
+    console.log(err);
+  })
+}
+
 start();
+
+module.exports = { logMsg };

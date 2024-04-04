@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "start": "node logs.js",
-    "dev": "nodemon -r dotenv/config logs.js --legacy-watch"
+    "dev": "nodemon -r dotenv/config logs.js --legacy-watch",
+    "test": "jest",
+    "lint": "npx eslint ."
   },
   "dependencies": {
     "amqplib": "^0.10.3",

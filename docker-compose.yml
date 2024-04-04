@@ -22,16 +22,15 @@ services:
     build: 
       context: ./logger
       dockerfile: dockerfile.prod
-    volumes:
-      - logs:/logs
     deploy:
       restart_policy:
         condition: on-failure
     depends_on:
+      - logdatabase
       - messagebus
     environment:
       - MESSAGE_QUEUE=amqp://devops-messagebus
-      - MONGO_URL=mongodb://admin:admin@devops-logs:27018
+      - MONGO_URL=mongodb://admin:admin@devops-logs:27017
   messagebus:
     container_name: devops-messagebus
     image: rabbitmq:latest
@@ -56,7 +55,7 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=admin
       - MONGO_INITDB_DATABASE=devops-logs
     expose:
-      - 27018
+      - 27017
     volumes:
        - log_data:/data/db
 volumes:
