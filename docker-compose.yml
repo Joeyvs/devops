@@ -5,16 +5,35 @@ services:
     container_name: devops-application
     build: 
       context: ./application
-      dockerfile: dockerfile
-    command: npm run dev
+      dockerfile: dockerfile.prod
     ports: 
       - 3000:3000
+    deploy:
+      restart_policy:
+        condition: on-failure
     depends_on:
       - database
+      - messagebus
     environment:
-      - PORT=3000
+      - MESSAGE_QUEUE=amqp://devops-messagebus
       - MONGO_URL=mongodb://admin:admin@devops-db:27017
-      - DB_NAME=devops-db
+  logger:
+    container_name: devops-logger
+    build: 
+      context: ./logger
+      dockerfile: dockerfile.prod
+    deploy:
+      restart_policy:
+        condition: on-failure
+    depends_on:
+      - logdatabase
+      - messagebus
+    environment:
+      - MESSAGE_QUEUE=amqp://devops-messagebus
+      - MONGO_URL=mongodb://admin:admin@devops-logs:27017
+  messagebus:
+    container_name: devops-messagebus
+    image: rabbitmq:latest
   database:
     container_name: devops-db
     image: mongo:latest
@@ -26,6 +45,19 @@ services:
     expose:
       - 27017
     volumes:
-       - mongo_data:/data/db
+       - app_data:/data/db
+  logdatabase:
+    container_name: devops-logs
+    image: mongo:latest
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+      - MONGO_INITDB_DATABASE=devops-logs
+    expose:
+      - 27017
+    volumes:
+       - log_data:/data/db
 volumes:
-  mongo_data:
+  app_data:
+  log_data:
