@@ -1,6 +1,17 @@
 version: '1'
 name: devops-project
 services:
+  messagebus:
+    container_name: devops-messagebus
+    image: rabbitmq:latest
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    ports:
+      - "5672:5672"
+      - "15672:15672"
   application:
     container_name: devops-application
     build: 
@@ -12,8 +23,10 @@ services:
       restart_policy:
         condition: on-failure
     depends_on:
-      - database
-      - messagebus
+      database:
+        condition: service_started
+      messagebus:
+        condition: service_healthy
     environment:
       - MESSAGE_QUEUE=amqp://devops-messagebus
       - MONGO_URL=mongodb://admin:admin@devops-db:27017
@@ -26,14 +39,13 @@ services:
       restart_policy:
         condition: on-failure
     depends_on:
-      - logdatabase
-      - messagebus
+      logdatabase:
+        condition: service_started
+      messagebus:
+        condition: service_healthy
     environment:
       - MESSAGE_QUEUE=amqp://devops-messagebus
       - MONGO_URL=mongodb://admin:admin@devops-logs:27017
-  messagebus:
-    container_name: devops-messagebus
-    image: rabbitmq:latest
   database:
     container_name: devops-db
     image: mongo:latest
