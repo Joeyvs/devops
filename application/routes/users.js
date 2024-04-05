@@ -37,10 +37,12 @@ router.post('/', async function (req, res) {
 
 async function queueLog(log) {
   try {
-    const connection = await amqp.connect(process.env.MESSAGE_QUEUE);
+    const connection = await amqp.connect(process.env.MESSAGE_QUEUE || 'amqp://localhost');
+    console.log(connection);
     if(!connection) {
       return;
     }
+    console.log('Connected to message queue');
 
     const channel = await connection.createChannel();
     if(!channel) {
