@@ -1,0 +1,14 @@
+groups:
+  - name: Application Alerts
+    rules:
+      - alert: 'On app down'
+        expr: up{job="application"} < 1
+        for: 30s
+      - alert: HighRequestRate
+        expr: rate(http_requests_total{job="application"}[5m]) > 10
+        for: 1m
+  - name: Database Alerts
+    rules:
+      - alert: 'On db down'
+        expr: up{job="db-exporter"} < 1
+        for: 30s
