@@ -3,7 +3,7 @@ global:
   smtp_smarthost: 'smtp.sendgrid.net:587'
   smtp_from: 'Alertmanager <jtj.vansetten@student.avans.nl>'
   smtp_auth_username: 'apikey'
-  smtp_auth_password: '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'
+  smtp_auth_password: ''
 
 receivers:
 - name: mail
