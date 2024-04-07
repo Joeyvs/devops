@@ -1,0 +1,104 @@
+kind: Environment
+name: preview
+type: primary
+urlHandle: previewjoeylevi
+components:
+    -
+        kind: Application
+        name: application
+        gitRepo: 'https://github.com/Joeyvs/devops.git'
+        gitBranch: main
+        gitApplicationPath: application
+        dockerCompose:
+            build:
+                context: ./application
+                dockerfile: dockerfile.prod
+            deploy: {  }
+            environment:
+                MESSAGE_QUEUE: 'amqp://devops-messagebus'
+                MONGO_URL: 'mongodb://admin:admin@devops-db:27017'
+            ports:
+                - '3000:3000'
+        hosts:
+            -
+                hostname: 'application-{{ env.base_domain }}'
+                path: /
+                servicePort: 3000
+    -
+        kind: Database
+        name: database
+        dockerCompose:
+            environment:
+                MONGO_INITDB_DATABASE: devops-db
+                MONGO_INITDB_ROOT_PASSWORD: admin
+                MONGO_INITDB_ROOT_USERNAME: admin
+            image: 'mongo:latest'
+            restart: always
+            ports:
+                - '27017:27017'
+        volumes:
+            -
+                name: app-data
+                mount: /data/db
+                subPath: ''
+    -
+        kind: Database
+        name: logdatabase
+        dockerCompose:
+            environment:
+                MONGO_INITDB_DATABASE: devops-logs
+                MONGO_INITDB_ROOT_PASSWORD: admin
+                MONGO_INITDB_ROOT_USERNAME: admin
+            image: 'mongo:latest'
+            restart: always
+            ports:
+                - '27017:27017'
+        volumes:
+            -
+                name: log-data
+                mount: /data/db
+                subPath: ''
+    -
+        kind: Application
+        name: logging
+        gitRepo: 'https://github.com/Joeyvs/devops.git'
+        gitBranch: main
+        gitApplicationPath: logging
+        dockerCompose:
+            build:
+                context: ./logging
+                dockerfile: dockerfile.prod
+            deploy: {  }
+            environment:
+                MESSAGE_QUEUE: 'amqp://devops-messagebus'
+                MONGO_URL: 'mongodb://admin:admin@devops-logs:27017'
+    -
+        kind: Service
+        name: messagebus
+        dockerCompose:
+            healthcheck:
+                test:
+                    - CMD
+                    - rabbitmqctl
+                    - status
+                timeout: 10s
+                interval: 30s
+                retries: 5
+            image: 'rabbitmq:latest'
+            ports:
+                - '5672:5672'
+                - '15672:15672'
+        hosts:
+            -
+                hostname: 'messagebus-{{ env.base_domain }}'
+                path: /
+                servicePort: 5672
+volumes:
+    -
+        name: app-data
+        size: 1Gi
+        type: disk
+    -
+        name: log-data
+        size: 1Gi
+        type: disk
