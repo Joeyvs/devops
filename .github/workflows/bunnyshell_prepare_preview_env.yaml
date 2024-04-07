@@ -14,7 +14,7 @@ jobs:
     uses: bunnyshell/workflows/.github/workflows/prepare-configuration.yaml@v2
     with:
       bunnyshell-yaml-path: .bunnyshell/bunnyshell.yaml
-      allowed-users: '*'
+      allowed-users: "*"
       git-ref: refs/pull/${{ github.event.number || github.event.issue.number }}/head
       restricted-files: |
         .bunnyshell/*
