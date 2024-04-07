@@ -29,7 +29,7 @@ services:
         condition: service_healthy
     environment:
       - MESSAGE_QUEUE=amqp://devops-messagebus
-      - MONGO_URL=mongodb://admin:admin@devops-db:27017
+      - MONGO_URL=mongodb://admin:admin@database:27017
   logging:
     container_name: devops-logging
     build: 
@@ -45,9 +45,9 @@ services:
         condition: service_healthy
     environment:
       - MESSAGE_QUEUE=amqp://devops-messagebus
-      - MONGO_URL=mongodb://admin:admin@devops-logs:27017
+      - MONGO_URL=mongodb://admin:admin@logdatabase:27017
   database:
-    container_name: devops-db
+    container_name: database
     image: mongo:latest
     restart: always
     environment:
@@ -59,7 +59,7 @@ services:
     volumes:
        - app_data:/data/db
   logdatabase:
-    container_name: devops-logs
+    container_name: logdatabase
     image: mongo:latest
     restart: always
     environment:
