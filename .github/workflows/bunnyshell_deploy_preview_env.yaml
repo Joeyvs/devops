@@ -2,7 +2,7 @@ name: Bunnyshell - Deploy Preview Environment
 on:
   workflow_run:
     workflows:
-      - 'Bunnyshell - Prepare Preview Environment Configuration'
+      - "Bunnyshell - Prepare Preview Environment Configuration"
     types:
       - completed
 permissions:
