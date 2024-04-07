@@ -30,10 +30,10 @@ services:
     environment:
       - MESSAGE_QUEUE=amqp://devops-messagebus
       - MONGO_URL=mongodb://admin:admin@devops-db:27017
-  logger:
-    container_name: devops-logger
+  logging:
+    container_name: devops-logging
     build: 
-      context: ./logger
+      context: ./logging
       dockerfile: dockerfile.prod
     deploy:
       restart_policy:

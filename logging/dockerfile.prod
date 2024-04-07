@@ -1,7 +1,7 @@
 FROM node:20
 
 ENV MONGO_URL=mongodb://devops-logs:27018
-ENV DB_NAME=logger
+ENV DB_NAME=logging
 ENV MESSAGE_QUEUE=amqp://devops-messagebus
 
 WORKDIR /logger

@@ -1,8 +1,8 @@
-name: Logger CI
+name: Logging CI
 on:
   push:
     paths:
-      - 'logger/**'
+      - 'logging/**'
   pull_request:
     branches:
       - main
@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./logger
+        working-directory: ./logging
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -20,8 +20,8 @@ jobs:
         run: npm install
       - name: Run linter
         run: npm run lint
-        working-directory: ./logger
+        working-directory: ./logging
       - name: Run tests
         uses: ArtiomTr/jest-coverage-report-action@v2.3.0
         with:
-          working-directory: ./logger
+          working-directory: ./logging
