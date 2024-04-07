@@ -10,5 +10,5 @@ groups:
   - name: Database Alerts
     rules:
       - alert: 'On db down'
-        expr: up{job="database"} < 1
+        expr: up{job="db-exporter"} < 1
         for: 30s

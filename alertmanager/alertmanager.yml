@@ -1,0 +1,18 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  group_by: ['alertname']
+  group_wait: 10s
+  group_interval: 10m
+  repeat_interval: 1h
+  receiver: 'email-me'
+
+receivers:
+- name: 'email-me'
+  email_configs:
+  - to: 'jtj.vansetten@student.avans.nl'
+    from: 'jtj.vansetten@student.avans.nl'
+    smarthost: 'smtp.sendgrid.net:587'
+    auth_username: apikey
+    auth_password: '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'
