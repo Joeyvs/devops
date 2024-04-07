@@ -18,7 +18,7 @@ services:
       context: ./application
       dockerfile: dockerfile.prod
     ports: 
-      - 3000:3000
+      - 3001:3001
     deploy:
       restart_policy:
         condition: on-failure
@@ -28,8 +28,12 @@ services:
       messagebus:
         condition: service_healthy
     environment:
+      - PORT=3001
       - MESSAGE_QUEUE=amqp://devops-messagebus
       - MONGO_URL=mongodb://admin:admin@database:27017
+    volumes:
+      - ./application:/usr/src/app
+      - /usr/src/app/node_modules
   logging:
     container_name: devops-logging
     build: 
@@ -70,6 +74,15 @@ services:
       - 27017
     volumes:
        - log_data:/data/db
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prometheus_data:/prometheus
+    ports:
+      - 9090:9090
+    command: --web.enable-lifecycle --config.file=/etc/prometheus/prometheus.yml
 volumes:
   app_data:
   log_data:
+  prometheus_data:
