@@ -60,6 +60,8 @@ services:
       - MONGO_INITDB_DATABASE=devops-db
     expose:
       - 27017
+    ports:
+      - 27017:27017
     volumes:
        - app_data:/data/db
   logdatabase:
@@ -86,6 +88,14 @@ services:
     build: ./grafana
     ports:
       - 3000:3000
+  db-exporter:
+    container_name: db-exporter
+    image: bitnami/mongodb-exporter:latest
+    environment:
+      - MONGODB_URI=mongodb://admin:admin@database:27017
+      - MONGODB_EXPORTER_ENABLE_ADMIN_API=true
+    ports:
+      - 9216:9216
 volumes:
   app_data:
   log_data:
