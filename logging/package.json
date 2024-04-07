@@ -1,10 +1,10 @@
 {
-  "name": "logger",
+  "name": "logging",
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node logs.js",
-    "dev": "nodemon -r dotenv/config logs.js --legacy-watch",
+    "start": "node ./bin/www",
+    "dev": "nodemon -r dotenv/config ./bin/www --legacy-watch",
     "test": "jest",
     "lint": "npx eslint ."
   },

@@ -6,22 +6,22 @@ const { db } = require('../services/database')
 
 /* GET users listing. */
 router.get('/', async function (req, res) {
-  const users = await db.collection('users').find().toArray()
-  res.json(users)
-
-  const connection = await amqp.connect(process.env.MESSAGE_QUEUE)
-  const channel = await connection.createChannel();
-  await channel.assertQueue('logs', { durable: true });
+  if(db) { 
+    const users = await db.collection('users').find().toArray()
+    res.json(users)
+  } else {
+    res.json({ msg: 'No database connection'})
+  }
 
   await queueLog(`Received a request to get all users`);
 })
 
 router.post('/', async function (req, res) {
-  // if (!req.body) {
-  //   res.status(500).json({ error: 'No data provided' })
-  //   queueLog(`Failed to create user: No data provided`);
-  //   return;
-  // }
+  if (!req.body.name) {
+    res.status(500).json({ error: 'At least a name must be provided' })
+    queueLog(`Failed to create user: At least a name must be provided`);
+    return;
+  }
 
   db.collection('users').insertOne(req.body)
     .then(async (user) => {
@@ -50,7 +50,9 @@ async function queueLog(log) {
     }
 
     await channel.assertQueue('logs', { durable: true });
-    channel.sendToQueue('logs', Buffer.from(log))
+    channel.sendToQueue('logs', Buffer.from(log));
+
+    await channel.close();
   }
   catch(err) { /* empty */ }	
   

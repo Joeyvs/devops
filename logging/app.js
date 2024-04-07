@@ -1,3 +1,8 @@
+var express = require('express');
+var path = require('path');
+var cookieParser = require('cookie-parser');
+var logger = require('morgan');
+
 const amqp = require('amqplib');
 const { db } = require('./services/database');
 
@@ -27,6 +32,16 @@ function logMsg(msg) {
   })
 }
 
-start();
+var app = express();
 
-module.exports = { logMsg };
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
+
+if (process.env.NODE_ENV !== 'test') {
+    start();
+}
+
+module.exports = app;

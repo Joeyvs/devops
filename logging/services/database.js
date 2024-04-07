@@ -8,4 +8,4 @@ const db = client.db(process.env.DB_NAME || "logs");
 module.exports = {
     db: db,
     client: client
-};
+}; 
